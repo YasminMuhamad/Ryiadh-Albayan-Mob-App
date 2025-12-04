@@ -1,3 +1,126 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Amiri:wght@400;700&family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+
+/* ======= المتغيرات ======= */
+:root {
+  --font-size: 16px;
+
+  /* ألوان عامة */
+  --background: #faf9f6;
+  --foreground: #1b1b1b;
+  --card: #fffdf8;
+  --card-foreground: #1b1b1b;
+  --popover: #fffdf8;
+  --popover-foreground: #1b1b1b;
+
+  /* ألوان أساسية */
+  --primary: #0e7c7b;
+  --primary-foreground: #fffdf8;
+  --secondary: #e9d8a6;
+  --secondary-foreground: #1b1b1b;
+  --muted: #f5f1e8;
+  --muted-foreground: #6b6b6b;
+  --accent: #e9d8a6;
+  --accent-foreground: #1b1b1b;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+
+  /* عناصر واجهة المستخدم */
+  --border: rgba(14, 124, 123, 0.15);
+  --input: transparent;
+  --input-background: #fffdf8;
+  --switch-background: #cbced4;
+  --ring: #0e7c7b;
+
+  /* ألوان الرسوم البيانية */
+  --chart-1: #0e7c7b;
+  --chart-2: #e9d8a6;
+  --chart-3: #b08968;
+  --chart-4: #7f5539;
+  --chart-5: #9c6644;
+
+  /* أبعاد وزوايا */
+  --radius: 1.25rem;
+
+  /* الشريط الجانبي */
+  --sidebar: #fffdf8;
+  --sidebar-foreground: #1b1b1b;
+  --sidebar-primary: #0e7c7b;
+  --sidebar-primary-foreground: #fffdf8;
+  --sidebar-accent: #e9d8a6;
+  --sidebar-accent-foreground: #1b1b1b;
+  --sidebar-border: rgba(14, 124, 123, 0.15);
+  --sidebar-ring: #0e7c7b;
+
+  /* أوزان الخط */
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+}
+
+/* ===== الوضع الداكن ===== */
+.dark {
+  --background: #1b1b1b;
+  --foreground: #faf9f6;
+  --card: #1b1b1b;
+  --card-foreground: #faf9f6;
+  --popover: #1b1b1b;
+  --popover-foreground: #faf9f6;
+
+  --primary: #0e7c7b;
+  --primary-foreground: #fffdf8;
+  --secondary: #e9d8a6;
+  --secondary-foreground: #1b1b1b;
+  --muted: #333333;
+  --muted-foreground: #cccccc;
+  --accent: #e9d8a6;
+  --accent-foreground: #1b1b1b;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+
+  --border: rgba(255, 255, 255, 0.1);
+  --input: #333;
+  --ring: #0e7c7b;
+
+  --chart-1: #0e7c7b;
+  --chart-2: #e9d8a6;
+  --chart-3: #b08968;
+  --chart-4: #7f5539;
+  --chart-5: #9c6644;
+
+  --sidebar: #1b1b1b;
+  --sidebar-foreground: #faf9f6;
+  --sidebar-primary: #0e7c7b;
+  --sidebar-primary-foreground: #fffdf8;
+  --sidebar-accent: #e9d8a6;
+  --sidebar-accent-foreground: #1b1b1b;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #0e7c7b;
+}
+
+/* ===== الخطوط ===== */
+body {
+  font-family: "Poppins", "Cairo", sans-serif;
+  font-size: var(--font-size);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* خطوط مخصصة */
+.font-cairo { font-family: "Cairo", sans-serif; }
+.font-amiri { font-family: "Amiri", serif; }
+.font-poppins { font-family: "Poppins", sans-serif; }
+.font-inter { font-family: "Inter", sans-serif; }
+.arabic-text { font-family: "Cairo", "Amiri", sans-serif; direction: rtl; }
+
+/* ===== قواعد عامة للعناصر ===== */
+* {
+  border-color: var(--border);
+  outline-color: var(--ring);
+  box-sizing: border-box;
+}
+
+h1 { font-size: 2rem; font-weight: var(--font-weight-medium); line-height: 1.5; }
+h2 { font-size: 1.75rem; font-weight: var(--font-weight-medium); line-height: 1.5; }
+h3 { font-size: 1.5rem; font-weight: var(--font-weight-medium); line-height: 1.5; }
+h4 { font-size: 1.25rem; font-weight: var(--font-weight-medium); line-height: 1.5; }
+p, input { font-size: 1rem; font-weight: var(--font-weight-normal); line-height: 1.5; }
+label, button { font-size: 1rem; font-weight: var(--font-weight-medium); line-height: 1.5; }
