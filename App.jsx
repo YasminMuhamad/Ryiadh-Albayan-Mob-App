@@ -5,7 +5,8 @@ import { HomeScreen } from "pages/home/HomeScreen";
 import { CoursesScreen } from "pages/courses/CoursesScreen";
 import { CourseDetails } from "pages/courses/CourseDetails";
 import { Profile } from "pages/profile/Profile";
-import { About } from "pages/home/About";
+import AboutScreen from "pages/home/About"; 
+
 import { Colors, Fonts } from "./theme";
 import { Text, View } from "react-native";
 import Feather from '@expo/vector-icons/Feather';
@@ -74,7 +75,7 @@ export default function App() {
         <Drawer.Screen name="Courses" component={CoursesScreen} />
         <Drawer.Screen name="Course Details" component={CourseDetails} />
         <Drawer.Screen name="Profile" component={Profile} />
-        <Drawer.Screen name="About" component={About} />
+        <Drawer.Screen name="About" component={AboutScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
