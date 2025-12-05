@@ -1,9 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { app } from "../../firebase.config";
-// Reuse the root firebase.config app to avoid duplicate initialization errors
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getApps, initializeApp } from "firebase/app";
+import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 
 const firebaseConfig = {
@@ -17,20 +15,30 @@ const firebaseConfig = {
   measurementId: "G-ZVENF1PYSB",
 };
 
-// Initialize Firebase
-// const app = initializeApp(firebaseConfig);
+// Initialize Firebase once (works in Expo web + native)
+export const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 // Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-const messaging = getMessaging(app);
+
+let messagingInstance = null;
 
 // Request permission & get FCM token
 export const requestFirebaseNotificationPermission = async () => {
   try {
+    if (!messagingInstance) {
+      const supported = await isSupported();
+      if (!supported) {
+        console.log("Firebase messaging is not supported in this environment.");
+        return null;
+      }
+      messagingInstance = getMessaging(app);
+    }
+
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      const token = await getToken(messaging, {
+      const token = await getToken(messagingInstance, {
         vapidKey:
           "BD0x5G8XEvVT85pTjhOeG2qjWsyxgAeXDa969HHgsVMnrM57ZLIukSoZLy5p24DVAaY4_yKcoxQVIFQ9hQJHAWI",
       });
