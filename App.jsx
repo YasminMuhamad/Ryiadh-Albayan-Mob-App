@@ -14,11 +14,11 @@ import ResetPasswordScreen from "./pages/auth/ResetPasswordScreen";
 import StudentProfile from "./pages/profile/Profile";
 
 import { Colors, Fonts } from "./theme";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Feather from '@expo/vector-icons/Feather';
-
-// ← **هنا** استورد الـ AuthProvider من ملف الـ context عندك
-import { AuthProvider } from "./context/AuthContext"; // <-- عدّلي المسار لو مختلف
+import { CartProvider, useCart } from "./context/CartContext";
+import { ToastProvider } from "./context/ToastContext";
+import { CartScreen } from "pages/cart/CartScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -51,13 +51,13 @@ function CustomDrawerContent(props) {
           <Feather name="book-open" size={24} color="#0E7C7B" />
         </View>
 
-        <Text style={{
-          fontFamily: Fonts.poppins,
-          fontSize: 20,
-          color: Colors.sidebarForeground
-        }}>
-          Riyadh Albayan
-        </Text>
+  <Text style={{ 
+    fontFamily: Fonts.poppins, 
+    fontSize: 20, 
+    color: Colors.sidebarForeground 
+  }}>
+    Riyadh-Albayan
+  </Text>
 
       </View>
 
@@ -68,31 +68,84 @@ function CustomDrawerContent(props) {
 
 export default function App() {
   return (
-    // ← لفينا كل الـ Navigation بالـ AuthProvider
-    <AuthProvider>
-      <NavigationContainer>
-        <Drawer.Navigator
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
-          screenOptions={{
-            headerStyle: { backgroundColor: Colors.primary },
-            headerTintColor: Colors.primaryForeground,
-            drawerActiveBackgroundColor: Colors.sidebarPrimary,
-            drawerActiveTintColor: Colors.sidebarPrimaryForeground,
-            drawerInactiveTintColor: Colors.sidebarForeground,
-          }}
-        >
-          <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="Courses" component={CoursesScreen} />
-          <Drawer.Screen name="Course Details" component={CourseDetails} />
-          {/* <Drawer.Screen name="Profile" component={Profile} /> */}
-          <Drawer.Screen name="About" component={AboutScreen} />
-          <Drawer.Screen name="Login" component={LoginScreen} />
-          <Drawer.Screen name="Register" component={RegisterScreen} />
-          <Drawer.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Drawer.Screen name="ResetPassword" component={ResetPasswordScreen} />
-          <Drawer.Screen name="StudentProfile" component={StudentProfile} />
-        </Drawer.Navigator>
-      </NavigationContainer>
-    </AuthProvider>
+    <ToastProvider>
+      <CartProvider>
+        <MainNavigator />
+      </CartProvider>
+    </ToastProvider>
   );
 }
+
+function MainNavigator() {
+  const { cartCount } = useCart();
+
+  return (
+    <NavigationContainer>
+      <Drawer.Navigator
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        screenOptions={{
+          headerStyle: { backgroundColor: Colors.primary },
+          headerTintColor: Colors.primaryForeground,
+          drawerActiveBackgroundColor: Colors.sidebarPrimary,
+          drawerActiveTintColor: Colors.sidebarPrimaryForeground,
+          drawerInactiveTintColor: Colors.sidebarForeground,
+        }}
+      >
+        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Courses" component={CoursesScreen} />
+        <Drawer.Screen
+          name="Cart"
+          component={CartScreen}
+          options={{
+            drawerIcon: ({ color, size }) => (
+              <Feather name="shopping-cart" size={size} color={color} />
+            ),
+            drawerLabel: ({ color }) => (
+              <View style={styles.drawerLabelRow}>
+                <Text style={[styles.drawerLabelText, { color }]}>Cart</Text>
+                {cartCount ? (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{cartCount}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="Course Details"
+          component={CourseDetails}
+          options={{ drawerItemStyle: { display: "none" } }}
+        />
+        <Drawer.Screen name="Profile" component={Profile} />
+        <Drawer.Screen name="About" component={About} />
+      </Drawer.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  drawerLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  drawerLabelText: {
+    fontFamily: Fonts.poppins,
+    fontSize: 16,
+  },
+  badge: {
+    minWidth: 24,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    fontFamily: Fonts.poppins,
+    color: Colors.primaryForeground,
+    fontSize: 12,
+  },
+});
