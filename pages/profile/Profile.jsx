@@ -1,11 +1,12 @@
+// src/screens/StudentProfile.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Colors, Fonts, FontSizes, FontWeights } from "../../theme";
 
-export function Profile() {
+export default function StudentProfile() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile Page</Text>
+      <Text style={styles.title}>Welcome to Your Profile!</Text>
+      <Text style={styles.subtitle}>This is a safe placeholder screen with no dependencies.</Text>
     </View>
   );
 }
@@ -13,14 +14,19 @@ export function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f5f5f5",
   },
   title: {
-    fontFamily: Fonts.poppins,
-    fontSize: FontSizes.h1,
-    fontWeight: FontWeights.medium,
-    color: Colors.foreground,
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
   },
 });
