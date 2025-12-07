@@ -12,6 +12,7 @@ import RegisterScreen from "./pages/auth/Register";
 import ForgotPasswordScreen from "./pages/auth/ForgotPasswordScreen";
 import ResetPasswordScreen from "./pages/auth/ResetPasswordScreen";
 import StudentProfile from "./pages/profile/Profile";
+import InstructorsScreen from "./pages/home/Instructors";
 
 import { Colors, Fonts } from "./theme";
 import { StyleSheet, Text, View } from "react-native";
@@ -93,6 +94,7 @@ function MainNavigator() {
       >
         <Drawer.Screen name="Home" component={HomeScreen} />
         <Drawer.Screen name="Courses" component={CoursesScreen} />
+        <Drawer.Screen name="Instructors" component={InstructorsScreen} />
         <Drawer.Screen
           name="Cart"
           component={CartScreen}
@@ -117,8 +119,8 @@ function MainNavigator() {
           component={CourseDetails}
           options={{ drawerItemStyle: { display: "none" } }}
         />
-        <Drawer.Screen name="Profile" component={Profile} />
-        <Drawer.Screen name="About" component={About} />
+        <Drawer.Screen name="Profile" component={StudentProfile} />
+        <Drawer.Screen name="About" component={AboutScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
