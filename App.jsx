@@ -1,11 +1,14 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
-import { HomeScreen } from "pages/home/HomeScreen";
-import { CoursesScreen } from "pages/courses/CoursesScreen";
-import { CourseDetails } from "pages/courses/CourseDetails";
-import { Profile } from "pages/profile/Profile";
+import HomeScreen from "./src/pages/home/HomeScreen";
+import CoursesScreen from "./src/pages/courses/CoursesScreen";
+import CourseDetails from "./src/pages/courses/CourseDetails";
+import Profile from "./src/pages/profile/Profile";
+
 import AboutScreen from "pages/home/About"; 
+import InstructorDetails from "pages/Instructor/InstructorDetails";
+import InstructorsPage from "pages/Instructor/Instructors";
 
 import { Colors, Fonts } from "./theme";
 import { Text, View } from "react-native";
@@ -76,6 +79,8 @@ export default function App() {
         <Drawer.Screen name="Course Details" component={CourseDetails} />
         <Drawer.Screen name="Profile" component={Profile} />
         <Drawer.Screen name="About" component={AboutScreen} />
+        <Drawer.Screen name="Instructor Details" component={InstructorDetails} />
+        <Drawer.Screen name="Instructors" component={InstructorsPage} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
