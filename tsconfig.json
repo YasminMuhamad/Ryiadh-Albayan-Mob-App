@@ -1,8 +1,19 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "jsx": "react",
-    "skipLibCheck": true
+    "checkJs": false,
+    "jsx": "react-native",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
-  "include": ["./"]
+  "include": [
+    "./",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "extends": "expo/tsconfig.base"
 }
