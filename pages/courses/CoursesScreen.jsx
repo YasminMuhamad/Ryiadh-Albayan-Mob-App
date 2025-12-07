@@ -11,12 +11,14 @@ import {
   View,
   Platform,
   TextInput,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
-import { Colors, Fonts, FontSizes, FontWeights, Radius } from '../../theme';
-import { db } from '../../firebase';
-import Feather from '@expo/vector-icons/Feather';
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { Colors, Fonts, FontSizes, FontWeights, Radius } from "../../theme";
+import { db } from "../../firebase";
+import Feather from "@expo/vector-icons/Feather";
+import { useCart } from "../../context/CartContext";
+import { useToast } from "../../context/ToastContext";
 
 export function CoursesScreen() {
   const navigation = useNavigation();
@@ -29,7 +31,9 @@ export function CoursesScreen() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
+  const { addToCart, removeFromCart, cartItems } = useCart();
+  const { showToast } = useToast();
 
   const loadCourses = useCallback(
     async (isRefresh = false) => {
@@ -142,72 +146,131 @@ export function CoursesScreen() {
     loadCourses();
   }, [loadCourses]);
 
-  const renderCourse = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate('CourseDetails', { course: item })}>
-      <View style={styles.mediaWrapper}>
-        {item.thumbnail ? (
-          <Image source={{ uri: item.thumbnail }} style={styles.cover} resizeMode="cover" />
-        ) : (
-          <View style={[styles.cover, styles.coverPlaceholder]}>
-            <Feather name="book-open" size={32} color={Colors.primary} />
-            <Text style={styles.placeholderText}>Course</Text>
+  const renderCourse = ({ item }) => {
+    const isInCart = cartItems.some((course) => course.id === item.id);
+    const cartIconColor = isInCart
+      ? Colors.primaryForeground
+      : Colors.primary;
+    const handleCartPress = () => {
+      if (isInCart) {
+        removeFromCart(item.id);
+        showToast("Removed from cart", "error");
+      } else {
+        addToCart(item);
+        showToast("Added to cart", "success");
+      }
+    };
+
+    return (
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate("Course Details", { course: item })}
+      >
+        <View style={styles.mediaWrapper}>
+          {item.thumbnail ? (
+            <Image
+              source={{ uri: item.thumbnail }}
+              style={styles.cover}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.cover, styles.coverPlaceholder]}>
+              <Feather name="book-open" size={32} color={Colors.primary} />
+              <Text style={styles.placeholderText}>Course</Text>
+            </View>
+          )}
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>
+              {item.mode || item.type || "Recorded"}
+            </Text>
           </View>
-        )}
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{item.mode || item.type || 'Recorded'}</Text>
         </View>
-      </View>
 
-      <View style={styles.cardBody}>
-        {item.categoryName && (
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>{item.categoryName}</Text>
-          </View>
-        )}
+        <View style={styles.cardBody}>
+          {item.categoryName ? (
+            <View style={styles.chip}>
+              <Text style={styles.chipText}>{item.categoryName}</Text>
+            </View>
+          ) : null}
 
-        <Text style={styles.cardTitle}>{item.title || item.name || 'Course'}</Text>
-        {item.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {item.description}
+          <Text style={styles.cardTitle}>
+            {item.title || item.name || "Course"}
           </Text>
-        )}
-        {item.instructor && <Text style={styles.instructor}>Instructor: {item.instructor}</Text>}
+          {item.description ? (
+            <Text style={styles.description} numberOfLines={2}>
+              {item.description}
+            </Text>
+          ) : null}
+          {item.instructor ? (
+            <Text style={styles.instructor}>
+              Instructor: {item.instructor}
+            </Text>
+          ) : null}
 
-        <View style={styles.metaRow}>
-          {item.totalLessons && (
-            <View style={styles.metaItem}>
-              <Feather name="book-open" size={18} color={Colors.mutedForeground} />
-              <Text style={styles.metaText}>{item.totalLessons} lessons</Text>
-            </View>
-          )}
-          {item.totalModules && (
-            <View style={styles.metaItem}>
-              <Feather name="layers" size={18} color={Colors.mutedForeground} />
-              <Text style={styles.metaText}>{item.totalModules} modules</Text>
-            </View>
-          )}
-        </View>
+          <View style={styles.metaRow}>
+            {item.totalLessons ? (
+              <View style={styles.metaItem}>
+                <Feather name="book-open" size={18} color={Colors.mutedForeground} />
+                <Text style={styles.metaText}>{item.totalLessons} lessons</Text>
+              </View>
+            ) : null}
+            {item.totalModules ? (
+              <View style={styles.metaItem}>
+                <Feather name="layers" size={18} color={Colors.mutedForeground} />
+                <Text style={styles.metaText}>{item.totalModules} modules</Text>
+              </View>
+            ) : null}
+            {item.students ? (
+              <View style={styles.metaItem}>
+                <Feather
+                  name="users"
+                  size={18}
+                  color={Colors.mutedForeground}
+                />
+                <Text style={styles.metaText}>{item.students} students</Text>
+              </View>
+            ) : null}
+          </View>
 
-        <View style={styles.actionsRow}>
-          <Text style={styles.price}>{item.price ? `$ ${item.price}` : 'Free'}</Text>
-          <View style={styles.buttonRow}>
-            <Pressable
-              style={[
-                styles.secondaryButton,
-                hoveredDetailId === item.id && styles.secondaryButtonHover,
-              ]}
-              onPress={() => navigation.navigate('CourseDetails', { course: item })}
-              onHoverIn={() => setHoveredDetailId(item.id)}
-              onHoverOut={() => setHoveredDetailId(null)}>
-              <Text style={styles.secondaryButtonText}>Details</Text>
-            </Pressable>
+          <View style={styles.actionsRow}>
+            <Text style={styles.price}>
+              {item.price ? `$ ${item.price}` : "Free"}
+            </Text>
+            <View style={styles.buttonRow}>
+              <Pressable
+                style={[
+                  styles.secondaryButton,
+                  hoveredDetailId === item.id && styles.secondaryButtonHover,
+                ]}
+                onPress={() =>
+                  navigation.navigate("Course Details", { course: item })
+                }
+                onHoverIn={() => setHoveredDetailId(item.id)}
+                onHoverOut={() => setHoveredDetailId(null)}
+              >
+                <Text style={styles.secondaryButtonText}>
+                  Details
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.cartButton,
+                  isInCart && styles.cartButtonActive,
+                ]}
+                onPress={handleCartPress}
+              >
+                <Feather
+                  name="shopping-cart"
+                  size={20}
+                color={cartIconColor}
+                />
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   if (loading && !refreshing && !courses.length) {
     return (
@@ -341,8 +404,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.poppins,
     fontSize: FontSizes.h1,
     fontWeight: FontWeights.medium,
-    color: Colors.foreground,
-    textAlign: 'center',
+    color: Colors.primary,
+    textAlign: "center",
   },
   heroSubtitle: {
     fontFamily: Fonts.poppins,
@@ -503,9 +566,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 24,
   },
-  secondaryButtonHover: { backgroundColor: Colors.secondary, borderColor: Colors.secondary },
-  secondaryButtonText: { fontFamily: Fonts.poppins, color: Colors.foreground },
-  stateContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  secondaryButtonHover: {
+    backgroundColor: Colors.secondary,
+    borderColor: Colors.secondary,
+  },
+  secondaryButtonText: {
+    fontFamily: Fonts.poppins,
+    color: Colors.foreground,
+  },
+  cartButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+  },
+  cartButtonActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  stateContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   stateText: {
     marginTop: 8,
     fontFamily: Fonts.cairo,

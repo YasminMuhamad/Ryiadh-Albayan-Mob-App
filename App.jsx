@@ -20,14 +20,18 @@ import RegisterScreen from './pages/auth/Register';
 import ForgotPasswordScreen from './pages/auth/ForgotPasswordScreen';
 import ResetPasswordScreen from './pages/auth/ResetPasswordScreen';
 import ProfileScreen from './pages/profile/Profile';
+import StudentProfile from "./pages/profile/Profile";
 import NotificationsScreen from './pages/notifications/NotificationsScreen';
 import ChatScreen from './pages/chat/ChatScreen';
 import { ContactScreen } from './pages/contact/Contact';
-
 import { Colors, Fonts } from './theme';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationsProvider, useNotifications } from './context/NotificationsContext';
 import ChatWidget from './components/ChatWidget';
+import { CartProvider, useCart } from "./context/CartContext";
+import { ToastProvider } from "./context/ToastContext";
+import { CartScreen } from "pages/cart/CartScreen";
+
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -68,7 +72,15 @@ function CustomDrawerContent(props) {
         <View style={styles.drawerIcon}>
           <Feather name="book-open" size={24} color={Colors.primary} />
         </View>
-        <Text style={styles.drawerTitle}>Riyadh Albayan</Text>
+
+  <Text style={{ 
+    fontFamily: Fonts.poppins, 
+    fontSize: 20, 
+    color: Colors.sidebarForeground 
+  }}>
+    Riyadh-Albayan
+  </Text>
+
       </View>
 
       <DrawerItemList {...props} />
@@ -127,69 +139,148 @@ function DrawerNavigator() {
 }
 
 /* ---------------------- Stack Navigator (Hidden Pages) ---------------------- */
+// function RootNavigator() {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen name="MainApp" component={DrawerNavigator} options={{ headerShown: false }} />
+//       <Stack.Screen
+//         name="CourseDetails"
+//         component={CourseDetails}
+//         options={{ title: 'Course Details' }}
+//       />
+//       <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Chat' }} />
+//       <Stack.Screen
+//         name="Notifications"
+//         component={NotificationsScreen}
+//         options={{ title: 'Notifications' }}
+//       />
+//       <Stack.Screen
+//         name="Register"
+//         component={RegisterScreen}
+//         options={{ title: 'Create Account' }}
+//       />
+//       <Stack.Screen
+//         name="ForgotPassword"
+//         component={ForgotPasswordScreen}
+//         options={{ title: 'Forgot Password' }}
+//       />
+//       <Stack.Screen
+//         name="ResetPassword"
+//         component={ResetPasswordScreen}
+//         options={{ title: 'Reset Password' }}
+//       />
+//       <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
+//     </Stack.Navigator>
+//   );
+// }
+
+
 function RootNavigator() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="MainApp" component={DrawerNavigator} options={{ headerShown: false }} />
-      <Stack.Screen
-        name="CourseDetails"
-        component={CourseDetails}
-        options={{ title: 'Course Details' }}
-      />
-      <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Chat' }} />
-      <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{ title: 'Notifications' }}
-      />
-      <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={{ title: 'Create Account' }}
-      />
-      <Stack.Screen
-        name="ForgotPassword"
-        component={ForgotPasswordScreen}
-        options={{ title: 'Forgot Password' }}
-      />
-      <Stack.Screen
-        name="ResetPassword"
-        component={ResetPasswordScreen}
-        options={{ title: 'Reset Password' }}
-      />
-      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainApp" component={DrawerNavigator} />
+      <Stack.Screen name="CourseDetails" component={CourseDetails} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
     </Stack.Navigator>
   );
 }
+
 
 /* ---------------------- Main App ---------------------- */
 export default function App() {
   return (
     <AuthProvider>
-      <AppWithNotifications />
+      <ToastProvider>
+        <CartProvider>
+          <NotificationsProvider>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+          </NotificationsProvider>
+        </CartProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }
 
-/* ---------------------- App With Notifications + Chat Widget ---------------------- */
 function AppWithNotifications() {
-  const { user } = useAuth();
-  const currentUserId = user ? user.uid : null;
-  const [currentRoute, setCurrentRoute] = useState(null);
+  const { currentRoute, setCurrentRoute } = useState(null);
 
   return (
-    <NotificationsProvider currentUserId={currentUserId}>
-      <NavigationContainer
-        onStateChange={(state) => {
-          const route = state.routes[state.index];
-          setCurrentRoute(route.name);
-        }}>
-        <RootNavigator />
-        {currentRoute !== 'Chat' && <ChatWidget />}
-      </NavigationContainer>
-    </NotificationsProvider>
+    <>
+      <ChatWidget />
+    </>
   );
 }
+
+
+/* ---------------------- App With Notifications + Chat Widget ---------------------- */
+// function AppWithNotifications() {
+//   const { cartCount } = useCart();
+//   const { user } = useAuth();
+//   const currentUserId = user ? user.uid : null;
+//   const [currentRoute, setCurrentRoute] = useState(null);
+
+//   return (
+//     <NotificationsProvider currentUserId={currentUserId}>
+//       <NavigationContainer
+//         onStateChange={(state) => {
+//           const route = state.routes[state.index];
+//           setCurrentRoute(route.name);
+//         }}>
+
+
+//           <Drawer.Navigator
+//         drawerContent={(props) => <CustomDrawerContent {...props} />}
+//         screenOptions={{
+//           headerStyle: { backgroundColor: Colors.primary },
+//           headerTintColor: Colors.primaryForeground,
+//           drawerActiveBackgroundColor: Colors.sidebarPrimary,
+//           drawerActiveTintColor: Colors.sidebarPrimaryForeground,
+//           drawerInactiveTintColor: Colors.sidebarForeground,
+//         }}
+//       >
+//         <Drawer.Screen name="Home" component={HomeScreen} />
+//         <Drawer.Screen name="Courses" component={CoursesScreen} />
+//         <Drawer.Screen
+//           name="Cart"
+//           component={CartScreen}
+//           options={{
+//             drawerIcon: ({ color, size }) => (
+//               <Feather name="shopping-cart" size={size} color={color} />
+//             ),
+//             drawerLabel: ({ color }) => (
+//               <View style={styles.drawerLabelRow}>
+//                 <Text style={[styles.drawerLabelText, { color }]}>Cart</Text>
+//                 {cartCount ? (
+//                   <View style={styles.badge}>
+//                     <Text style={styles.badgeText}>{cartCount}</Text>
+//                   </View>
+//                 ) : null}
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Drawer.Screen
+//           name="Course Details"
+//           component={CourseDetails}
+//           options={{ drawerItemStyle: { display: "none" } }}
+//         />
+//         <Drawer.Screen name="Profile" component={Profile} />
+//         <Drawer.Screen name="About" component={About} />
+//       </Drawer.Navigator>
+//     </NavigationContainer>
+
+//         <RootNavigator />
+//         {currentRoute !== 'Chat' && <ChatWidget />}
+//     </NotificationsProvider>
+//   );
+// }
 
 /* ---------------------- Styles ---------------------- */
 const styles = StyleSheet.create({
@@ -229,5 +320,30 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.poppins,
     fontSize: 20,
     color: Colors.sidebarForeground,
+  },
+
+  drawerLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  drawerLabelText: {
+    fontFamily: Fonts.poppins,
+    fontSize: 16,
+  },
+  badge: {
+    minWidth: 24,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    fontFamily: Fonts.poppins,
+    color: Colors.primaryForeground,
+    fontSize: 12,
+
   },
 });
