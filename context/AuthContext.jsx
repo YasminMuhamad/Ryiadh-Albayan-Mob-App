@@ -6,7 +6,12 @@ import { loginUser as loginService, registerUser as registerService } from "../s
 import { doc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
+};
 
 export function AuthProvider({ children }) {
   const [firebaseUser, setFirebaseUser] = useState(null); // من Firebase Auth
@@ -15,11 +20,11 @@ export function AuthProvider({ children }) {
   const [uid, setUid] = useState(null);
   const role = "student"; // ثابت
 
+  // مراقبة حالة Firebase Auth
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const currentUid = user.uid;
-        // جلب profile من كوليكشن users فقط
         try {
           const docRef = doc(db, "users", currentUid);
           const snap = await getDoc(docRef);
@@ -46,16 +51,16 @@ export function AuthProvider({ children }) {
     return () => unsub();
   }, []);
 
+  // تسجيل مستخدم جديد
   const register = async (fullname, email, password) => {
-    // registerService يقوم بانشاء Auth user و doc في users
     const res = await registerService(fullname, email, password);
-    // بعد التسجيل نحدث ال-state مباشرة (auth.currentUser متاح)
     setFirebaseUser(auth.currentUser);
     setProfile(res.profile || null);
     setUid(res.uid || (auth.currentUser ? auth.currentUser.uid : null));
     return res;
   };
 
+  // تسجيل الدخول
   const login = async (email, password) => {
     const res = await loginService(email, password); // { uid, role, profile }
     setProfile(res.profile || null);
@@ -64,11 +69,16 @@ export function AuthProvider({ children }) {
     return res;
   };
 
+  // تسجيل الخروج
   const logout = async () => {
-    await signOut(auth);
-    setProfile(null);
-    setFirebaseUser(null);
-    setUid(null);
+    try {
+      await signOut(auth);
+      setProfile(null);
+      setFirebaseUser(null);
+      setUid(null);
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   const value = useMemo(() => ({
@@ -82,5 +92,9 @@ export function AuthProvider({ children }) {
     logout,
   }), [firebaseUser, profile, uid, loading]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
